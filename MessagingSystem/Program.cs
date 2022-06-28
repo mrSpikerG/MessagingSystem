@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -26,24 +27,36 @@ namespace MessagingSystem
                     //
                     Console.Write(" > ");
                     string msg = Console.ReadLine();
-                    if (msg.Equals("\\end"))
-                    {
-                        break;
-                    }
-                    byte[] data = Encoding.Unicode.GetBytes(msg);
+                    byte[] data = null;
+
+                    if (msg.Equals("\\end")) { break; }
+
+
+                    
+
+
+                    data = Encoding.Unicode.GetBytes(msg);
                     socket.Send(data);
                     stringBuilder.Clear();
+
+                    if (msg.StartsWith("path "))
+                    {
+                        byte[] FileFata = new byte[256];
+                        string TEMP = msg.Remove(0, 5);
+                        FileFata = File.ReadAllBytes(TEMP);
+                        socket.Send(FileFata);
+                    }
 
                     //
                     //  Считывание команды
                     //
                     byteCount = socket.Receive(buffer);
-                    stringBuilder.Append(Encoding.Unicode.GetString(buffer, 0, byteCount));
-                    string returnedInfo = stringBuilder.ToString();
-                    stringBuilder.Clear();
+                     stringBuilder.Append(Encoding.Unicode.GetString(buffer, 0, byteCount));
+                     string returnedInfo = stringBuilder.ToString();
+                     stringBuilder.Clear();
 
-                    WriteConsoleTime();
-                    Console.WriteLine($"Server msg: {returnedInfo}");
+                     WriteConsoleTime();
+                     Console.WriteLine($"Server msg: {returnedInfo}");
 
                 } while (true);
             }
