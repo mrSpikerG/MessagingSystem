@@ -38,20 +38,40 @@ namespace MessagingServer
 
                     if (command != String.Empty)
                     {
-                        Console.WriteLine($"Client msg:\t{command}");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write("[");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(DateTime.Now);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine($"] > {command}");
+
+                        File.AppendAllText("Logs.txt", $"[{DateTime.Now}] > {command}\n");
+
+
+
                         clientSocket.Send(buffer);
                         stringBuilder.Clear();
                         //if (command.Equals("\\end"))
                         //{
                         //}
 
-                        //if (command.StartsWith("path "))
-                        //{
+                        if (command.StartsWith("path "))
+                        {
+                            int id;
+                            if (!Directory.Exists("ReservedFiles"))
+                            {
+                                Directory.CreateDirectory("ReservedFiles");
+                                id = 0;
+                            }
+                            else
+                            {
+                                id = Directory.GetFiles("ReservedFiles").Length;
+                            }
 
                             byte[] FileFata = new byte[256];
                             int FileDataCount = clientSocket.Receive(FileFata);
-                            File.WriteAllBytes($"copy{command.Substring(command.Length - 4)}", FileFata);
-                        //}
+                            File.WriteAllBytes($"ReservedFiles\\copy_{id}_{DateTime.Now.ToShortDateString()}{command.Substring(command.Length - 4)}", FileFata);
+                        }
 
                     }
 
